@@ -1,0 +1,1997 @@
+// DisplayName = Non Sequitur
+// MissionTypes = Siege
+
+//--- MISSION QUOTE BEGIN ---
+//If you aspire to the highest place, it is no disgrace to stop at the second, or even the third, place.
+// -- Marcus Tullius Cicero
+// -- map and scripting by a tiny fishie
+//--- MISSION QUOTE END ---
+
+//--- MISSION STRING BEGIN ---
+//Three maps are chosen at random
+//[Siege]Each map is assigned a different switch
+//[Siege]Destroy main gens to access switch gens
+//[Siege]Fastest cap selects the next map
+//--- MISSION STRING END ---
+
+datablock ForceFieldBareData(StaticField)
+{
+	fadeMS           = 2000;
+	baseTranslucency = 1.0;
+	powerOffTranslucency = 0.0;
+	teamPermiable    = true;
+	otherPermiable   = false;
+	color            = "0.6 0.9 0.1";
+	powerOffColor    = "0.0 0.0 0.0";
+	targetTypeTag    = 'ForceField';
+
+	texture[0] = "skins/screenstatic1.png";
+	texture[1] = "skins/screenstatic2.png";
+	texture[2] = "skins/screenstatic3.png";
+	texture[3] = "skins/screenstatic4.png";
+	texture[4] = "skins/screenstatic5.png";
+
+	framesPerSec = 10;
+	numFrames = 5;
+	scrollSpeed = 7;
+	umapping = 0.4;
+	vmapping = 0.4;
+};
+
+function ForceFieldBareData::onAdd(%data, %obj)
+{
+	// make forcefields frictionless
+	ShapeBaseData::onAdd(%data, %obj);
+}
+
+//--- OBJECT WRITE BEGIN ---
+new SimGroup(MissionGroup) {
+
+	musicTrack = "lush";
+	cdTrack = "2";
+
+	new MissionArea(MissionArea) {
+		area = "-760 -904 1600 1776";
+		flightCeiling = "450";
+		flightCeilingRange = "20";
+
+		locked = "true";
+	};
+	new Sun() {
+		position = "1024 512 0";
+		rotation = "1 0 0 0";
+		scale = "1 1 1";
+		direction = "0.39736 0.39736 -0.82717";
+		color = "0.900000 0.900000 1.000000 1.000000";
+		ambient = "0.500000 0.500000 0.500000 1.000000";
+		texture[0] = "special/sunFlare";
+		texture[1] = "special/sunFlare02";
+		texture[2] = "special/LensFlare/flare01";
+		texture[3] = "special/LensFlare/flare02";
+		texture[4] = "special/LensFlare/flare03";
+		lensFlareScale = "0.3";
+		lensFlareIntensity = "0.9";
+		frontFlareSize = "100";
+		backFlareSize = "450";
+		flareColor = "1.000000 1.000000 0.900000 1.000000";
+
+		locked = "true";
+	};
+	new Sky(Sky) {
+		position = "-1304 -1032 0";
+		rotation = "1 0 0 0";
+		scale = "1 1 1";
+		cloudHeightPer[0] = "0.349971";
+		cloudHeightPer[1] = "0.25";
+		cloudHeightPer[2] = "0.199973";
+		cloudSpeed1 = "0.06";
+		cloudSpeed2 = "0.07";
+		cloudSpeed3 = "0.15";
+		visibleDistance = "550";
+		useSkyTextures = "1";
+		renderBottomTexture = "0";
+		SkySolidColor = "0.660000 0.690000 0.790000 1.000000";
+		fogDistance = "250";
+		fogColor = "0.660000 0.690000 0.790000 1.000000";
+		fogVolume1 = "450 0 60";
+		fogVolume2 = "350 60 120";
+		fogVolume3 = "250 120 150";
+		materialList = "lush_ram.dml";
+		windVelocity = "1 0 0";
+		windEffectPrecipitation = "0";
+		fogVolumeColor1 = "0.500000 0.500000 0.500000 1.000000";
+		fogVolumeColor2 = "0.500000 0.500000 0.500000 1.000000";
+		fogVolumeColor3 = "0.500000 0.500000 0.500000 1.000000";
+		high_visibleDistance = "600";
+		high_fogDistance = "350";
+		high_fogVolume1 = "50 0 50";
+		high_fogVolume2 = "75 50 100";
+		high_fogVolume3 = "100 100 650";
+
+		cloudSpeed0 = "0.000150 0.000050";
+		locked = "true";
+	};
+	new TerrainBlock(Terrain) {
+		rotation = "1 0 0 0";
+		scale = "1 1 1";
+		detailTexture = "details/lushdet2";
+		terrainFile = "Starfallen.ter";
+		squareSize = "8";
+		emptySquares = "83887 150702 347564 347820 151470 87215 109483 175274";
+
+		position = "-1024 -1024 0";
+		visibleDistance = "1100";
+		locked = "true";
+		hazeDistance = "900";
+	};
+	new NavigationGraph(NavGraph) {
+		conjoinAngleDev = "59";
+		cullDensity = "0.3";
+		customArea = "0 0 0 0";
+
+		position = "0 0 0 1";
+		GraphFile = "JacobsLadder.nav";
+		rotation = "0 0 0 0";
+		conjoinBowlDev = "20";
+		scale = "1 1 1";
+		coverage = "0";
+		locked = "true";
+	};
+	new SimGroup(ObserverDropPoints) {
+
+
+		new Camera() {
+			position = "-139.229 -30.2132 269.6";
+			rotation = "0.0884598 -0.15435 0.984048 121.157";
+			scale = "1 1 1";
+			dataBlock = "Observer";
+
+			locked = "false";
+		};
+		new Camera() {
+			position = "268.633 261.106 214.55";
+			rotation = "0.330372 -0.12178 0.935962 42.9925";
+			scale = "1 1 1";
+			dataBlock = "Observer";
+
+			locked = "false";
+		};
+		new Camera() {
+			position = "447.165 447.919 258.665";
+			rotation = "0.746869 -0.301824 0.592527 68.5901";
+			scale = "1 1 1";
+			dataBlock = "Observer";
+
+			locked = "false";
+		};
+		new Camera() {
+			position = "201.975 -449.433 198.485";
+			rotation = "0.136929 -0.105212 0.984978 75.9145";
+			scale = "1 1 1";
+			dataBlock = "Observer";
+
+			locked = "false";
+		};
+		new Camera() {
+			position = "-536.565 432.431 237.166";
+			rotation = "0.163747 -0.257658 0.95226 117.637";
+			scale = "1 1 1";
+			dataBlock = "Observer";
+
+			locked = "false";
+		};
+		new Camera() {
+			position = "437.486 -397.105 155.873";
+			rotation = "0.216014 0.250898 -0.943604 101.819";
+			scale = "1 1 1";
+			dataBlock = "Observer";
+
+			locked = "false";
+		};
+		new Camera() {
+			position = "350.19 352.841 164.541";
+			rotation = "0.00958418 0.0280672 0.99956 217.692";
+			scale = "1 1 1";
+			dataBlock = "Observer";
+
+			locked = "false";
+		};
+	};
+	new SimGroup(Teams) {
+
+
+		new SimGroup(Team0) {
+
+		};
+		new SimGroup(Team1) {
+
+
+			new SimGroup(spawnspheres) {
+
+
+				new SpawnSphere(TowerSpawn) {
+					position = "-40.168 -26.718 253.432";
+					rotation = "1 0 0 0";
+					scale = "1 1 1";
+					dataBlock = "SpawnSphereMarker";
+					radius = "80";
+					sphereWeight = "0";
+					indoorWeight = "100";
+					outdoorWeight = "0";
+
+					locked = "false";
+				};
+				new SpawnSphere(VehiclePadSpawn) {
+					position = "-443.463 415.275 157.971";
+					rotation = "1 0 0 0";
+					scale = "1 1 1";
+					dataBlock = "SpawnSphereMarker";
+					radius = "100";
+					sphereWeight = "100";
+					indoorWeight = "100";
+					outdoorWeight = "100";
+				};
+			};
+			new SimGroup(TowerBase) {
+
+
+				new InteriorInstance() {
+					position = "-34.5796 -37.2253 224.972";
+					rotation = "0 0 1 39.534";
+					scale = "1 1 1";
+					interiorFile = "btowr5.dif";
+					showTerrainInside = "0";
+					AudioProfile = "Universal_Base_2";
+					AudioEnvironment = "SmallRoom";
+
+					locked = "false";
+				};
+				new InteriorInstance() {
+					position = "-17.1592 -48.946 237.802";
+					rotation = "0 0 1 129.534";
+					scale = "1 1 1";
+					interiorFile = "bbrdg0.dif";
+					showTerrainInside = "0";
+
+					locked = "false";
+				};
+				new InteriorInstance() {
+					position = "-0.963095 -62.3126 237.802";
+					rotation = "-0 0 -1 50.466";
+					scale = "1 1 1";
+					interiorFile = "bbrdg2.dif";
+					showTerrainInside = "0";
+
+					locked = "false";
+				};
+				new StaticShape(MiddleTowerStation) {
+					position = "-38.2217 -31.5817 243.777";
+					rotation = "0 0 1 129.534";
+					scale = "1 1 1";
+					nameTag = "Middle Tower";
+					dataBlock = "StationInventory";
+
+					locked = "false";
+				};
+				new Item() {
+					position = "-24.0394 -43.2654 244.437";
+					rotation = "0 0 -1 50.9932";
+					scale = "1 1 1";
+					dataBlock = "RepairPack";
+					collideable = "0";
+					static = "1";
+					rotate = "0";
+
+					locked = "false";
+				};
+				new ForceFieldBare(TowerGenFF) {
+					position = "-37.7827 -35.8112 237.933";
+					rotation = "0 0 1 39.534";
+					scale = "0.392551 5.96689 4.78335";
+					dataBlock = "StaticField";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "-35.0786 -29.1599 237.832";
+					rotation = "0 0 1 33.8049";
+					scale = "1 1 1";
+					shapeName = "stackable3s.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "-40.4819 -34.2444 237.819";
+					rotation = "0 0 1 72.7659";
+					scale = "1 1 1";
+					shapeName = "stackable2m.dts";
+
+					locked = "false";
+				};
+				new StaticShape(TowerGen) {
+					position = "-36.6737 -32.9435 238.002";
+					rotation = "0 0 1 130.062";
+					scale = "1 1 1";
+					nameTag = "Tower";
+					dataBlock = "GeneratorLarge";
+
+					needsObjectiveWaypoint = "1";
+					locked = "false";
+				};
+				new StaticShape(UpperTowerStation) {
+					position = "-28.4956 -39.647 255.721";
+					rotation = "-0 0 -1 49.8471";
+					scale = "1 1 1";
+					nameTag = "Upper Tower";
+					dataBlock = "StationInventory";
+
+					locked = "false";
+				};
+				new StaticShape(LowerTowerStation) {
+					position = "-31.2956 -42.0217 237.837";
+					rotation = "0 0 1 221.735";
+					scale = "1 1 1";
+					nameTag = "Lower Tower";
+					dataBlock = "StationInventory";
+
+					locked = "false";
+				};
+				new StaticShape(TowerSensor) {
+					position = "-33.1087 -35.8044 270.208";
+					rotation = "0 0 1 127.77";
+					scale = "1 1 1";
+					nameTag = "Tower";
+					dataBlock = "SensorLargePulse";
+
+					locked = "false";
+				};
+				new Turret(UpperTowerSentry) {
+					position = "-33.3548 -35.6233 262.619";
+					rotation = "0 0 1 219.443";
+					scale = "1 1 1";
+					nameTag = "Upper Tower";
+					dataBlock = "SentryTurret";
+					initialBarrel = "SentryTurretBarrel";
+
+					locked = "false";
+				};
+				new Turret(LowerTowerSentry) {
+					position = "-35.6691 -33.8014 244.131";
+					rotation = "-0.686449 0.238355 0.687004 206.834";
+					scale = "1 1 1";
+					nameTag = "Lower Tower";
+					dataBlock = "SentryTurret";
+					initialBarrel = "SentryTurretBarrel";
+
+					locked = "false";
+				};
+			};
+			new SimGroup(VehiclePadBase) {
+
+				providesPower = "1";
+
+				new StaticShape() {
+					position = "-457.686 436.309 174.987";
+					rotation = "-0 0 -1 45.2637";
+					scale = "1 1 1";
+					nameTag = "Offense";
+					dataBlock = "StationVehiclePad";
+
+					hapcFlyer = "Removed";
+					BomberFlyer = "Removed";
+					Ready = "1";
+					ScoutFlyer = "Removed";
+				};
+				new InteriorInstance(InteriorInstance) {
+					position = "-452.353 430.96 175.497";
+					rotation = "0 0 1 134.736";
+					scale = "1 1 1";
+					interiorFile = "bvpad.dif";
+					showTerrainInside = "0";
+
+				};
+				new Item() {
+					position = "-478.591 456.912 177.881";
+					rotation = "0 0 -1 44.6907";
+					scale = "1 1 1";
+					dataBlock = "RepairPack";
+					collideable = "0";
+					static = "1";
+					rotate = "0";
+
+				};
+				new StaticShape(VPadStation1) {
+					position = "-489.703 444.915 177.638";
+					rotation = "0 0 -1 90.5273";
+					scale = "1 1 1";
+					nameTag = "Offense";
+					dataBlock = "StationInventory";
+
+				};
+				new StaticShape(VPadStation2) {
+					position = "-466.535 467.858 177.638";
+					rotation = "0 0 -1 2.29172";
+					scale = "1 1 1";
+					nameTag = "Offense";
+					dataBlock = "StationInventory";
+
+				};
+			};
+		};
+		new SimGroup(Team2) {
+
+
+			new SimGroup(spawnspheres) {
+
+
+				new SpawnSphere(PrimaryBaseSpawn) {
+					position = "382.996 -399.536 138.346";
+					rotation = "-0 0 -1 89.9545";
+					scale = "1 1 1";
+					dataBlock = "SpawnSphereMarker";
+					radius = "100";
+					sphereWeight = "70";
+					indoorWeight = "80";
+					outdoorWeight = "20";
+
+					locked = "false";
+				};
+				new SpawnSphere(SecondaryBaseSpawn) {
+					position = "376.746 395.537 151.171";
+					rotation = "1 0 0 0";
+					scale = "1 1 1";
+					dataBlock = "SpawnSphereMarker";
+					radius = "130";
+					sphereWeight = "30";
+					indoorWeight = "20";
+					outdoorWeight = "80";
+				};
+			};
+			new SimGroup(PrimaryBase) {
+
+
+				new TSStatic() {
+					position = "419.723 -386.516 150.337";
+					rotation = "0 0 -1 105.997";
+					scale = "1 1 1";
+					shapeName = "stackable3l.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "416.588 -387.282 150.337";
+					rotation = "0 0 -1 105.997";
+					scale = "1 1 1";
+					shapeName = "stackable3l.dts";
+
+					locked = "false";
+				};
+				new Item() {
+					position = "353.289 -393.255 166.684";
+					rotation = "0 0 -1 52.1391";
+					scale = "1 1 1";
+					dataBlock = "RepairPack";
+					collideable = "0";
+					static = "1";
+					rotate = "1";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "402.912 -405.135 164.346";
+					rotation = "-0 0 -1 74.4844";
+					scale = "1 1 1";
+					shapeName = "stackable3m.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "405.567 -404.831 166.44";
+					rotation = "-0 0 -1 81.36";
+					scale = "1 1 1";
+					shapeName = "stackable3m.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "405.573 -404.668 164.47";
+					rotation = "-0 0 -1 84.7978";
+					scale = "1 1 1";
+					shapeName = "stackable3m.dts";
+
+					locked = "false";
+				};
+				new InteriorInstance() {
+					position = "364.158 -387.643 160.954";
+					rotation = "-0 0 -1 89.9544";
+					scale = "1 1 1";
+					interiorFile = "bmisc4.dif";
+					showTerrainInside = "0";
+
+					locked = "false";
+				};
+				new InteriorInstance() {
+					position = "388.278 -387.421 161.841";
+					rotation = "-0 0 -1 89.9544";
+					scale = "1 1 1";
+					interiorFile = "bmisc4.dif";
+					showTerrainInside = "0";
+
+					locked = "false";
+				};
+				new ForceFieldBare(PrimaryGenFF2) {
+					position = "416.255 -399.808 144.364";
+					rotation = "-0 0 -1 0.573347";
+					scale = "6.0341 0.245452 5.50083";
+					dataBlock = "defaultSolidFieldBare";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "420.7 -371.552 150.167";
+					rotation = "-0 0 -1 2.29172";
+					scale = "1 1 1";
+					shapeName = "stackable3m.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "416.482 -372.031 150.39";
+					rotation = "-0 0 -1 6.30252";
+					scale = "1 1 1";
+					shapeName = "stackable1s.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "416.596 -371.964 150.99";
+					rotation = "1 0 0 0";
+					scale = "1 1 1";
+					shapeName = "stackable1s.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "417.99 -371.808 150.34";
+					rotation = "0 0 1 61.8798";
+					scale = "1 1 1";
+					shapeName = "stackable1s.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "353.239 -393.307 164.416";
+					rotation = "-0 0 -1 52.1391";
+					scale = "1 1 1";
+					shapeName = "stackable2l.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "413.415 -388.029 150.337";
+					rotation = "0 0 -1 105.997";
+					scale = "1 1 1";
+					shapeName = "stackable3l.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "418.758 -386.468 153.337";
+					rotation = "0 0 -1 115.738";
+					scale = "1 1 1";
+					shapeName = "stackable3l.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "414.297 -387.905 153.337";
+					rotation = "0 0 -1 104.851";
+					scale = "1 1 1";
+					shapeName = "stackable3l.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "410.424 -406.889 150.329";
+					rotation = "-0 0 -1 57.2958";
+					scale = "1 1 1";
+					shapeName = "stackable3l.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "413.435 -408.561 150.329";
+					rotation = "-0 0 -1 60.7335";
+					scale = "1 1 1";
+					shapeName = "stackable3l.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "416.187 -410.248 150.329";
+					rotation = "-0 0 -1 60.7335";
+					scale = "1 1 1";
+					shapeName = "stackable3l.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "414.139 -409.149 153.329";
+					rotation = "0 0 1 3.43748";
+					scale = "1 1 1";
+					shapeName = "stackable3l.dts";
+
+					locked = "false";
+				};
+				new Turret(PrimaryBaseTurret2) {
+					position = "380.96 -451.323 185.819";
+					rotation = "0 0 -1 90";
+					scale = "1 1 1";
+					nameTag = "Defense";
+					dataBlock = "TurretBaseLarge";
+					initialBarrel = "PlasmaBarrelLarge";
+
+					locked = "false";
+				};
+				new Turret(PrimaryBaseTurret1) {
+					position = "381.132 -347.351 185.864";
+					rotation = "0 0 -1 90";
+					scale = "1 1 1";
+					nameTag = "Defense";
+					dataBlock = "TurretBaseLarge";
+					initialBarrel = "PlasmaBarrelLarge";
+
+					locked = "false";
+				};
+				new Turret() {
+					position = "376.217 -399.668 166.361";
+					rotation = "-0 0 -1 89.9545";
+					scale = "1 1 1";
+					nameTag = "Upper Defense";
+					dataBlock = "SentryTurret";
+					initialBarrel = "SentryTurretBarrel";
+
+					locked = "false";
+				};
+				new Item() {
+					position = "441.572 -348.661 152.843";
+					rotation = "0 0 -1 0.573347";
+					scale = "1 1 1";
+					dataBlock = "RepairPack";
+					collideable = "0";
+					static = "1";
+					rotate = "1";
+
+					locked = "false";
+				};
+				new StaticShape(PrimaryGenerator2) {
+					position = "419.143 -392.196 144.59";
+					rotation = "0 0 1 90.1368";
+					scale = "1 1 1";
+					nameTag = "Primary";
+					dataBlock = "GeneratorLarge";
+
+					notRepairable = "1";
+					needsObjectiveWaypoint = "1";
+					locked = "false";
+				};
+				new StaticShape(PrimaryGenerator1) {
+					position = "419.105 -407.151 144.572";
+					rotation = "0 0 1 90.1368";
+					scale = "1 1 1";
+					nameTag = "Primary";
+					dataBlock = "GeneratorLarge";
+
+					notRepairable = "1";
+					needsObjectiveWaypoint = "1";
+					locked = "false";
+				};
+				new StaticShape() {
+					position = "441.555 -417.455 152.342";
+					rotation = "0 0 1 180.091";
+					scale = "1 1 1";
+					nameTag = "Primary Base";
+					dataBlock = "StationInventory";
+
+					locked = "false";
+				};
+				new StaticShape(PrimaryBaseSensor) {
+					position = "376.274 -399.738 176.195";
+					rotation = "0 0 -1 90";
+					scale = "1 1 1";
+					nameTag = "Defense";
+					dataBlock = "SensorLargePulse";
+
+					locked = "false";
+				};
+				new InteriorInstance() {
+					position = "388.216 -411.646 160.895";
+					rotation = "-0 0 -1 89.9544";
+					scale = "1 1 1";
+					interiorFile = "bmisc4.dif";
+					showTerrainInside = "0";
+
+					locked = "false";
+				};
+				new InteriorInstance() {
+					position = "364.143 -411.796 160.782";
+					rotation = "-0 0 -1 89.9544";
+					scale = "1 1 1";
+					interiorFile = "bmisc4.dif";
+					showTerrainInside = "0";
+
+					locked = "false";
+				};
+				new InteriorInstance() {
+					position = "376.305 -399.673 161.844";
+					rotation = "-0 0 -1 89.9545";
+					scale = "1 1 1";
+					interiorFile = "bbase1.dif";
+					showTerrainInside = "1";
+					AudioProfile = "Universal_Base_2";
+					AudioEnvironment = "BigRoom";
+
+					locked = "false";
+				};
+				new StaticShape() {
+					position = "376.148 -413.285 150.34";
+					rotation = "0 0 1 180.046";
+					scale = "1 1 1";
+					nameTag = "Primary Base";
+					dataBlock = "StationInventory";
+
+					locked = "false";
+				};
+				new StaticShape() {
+					position = "376.223 -385.992 150.341";
+					rotation = "0 0 1 0.0395647";
+					scale = "1 1 1";
+					nameTag = "Primary Base";
+					dataBlock = "StationInventory";
+
+					locked = "false";
+				};
+				new StaticShape() {
+					position = "430.753 -358.845 152.34";
+					rotation = "0 0 1 180.046";
+					scale = "1 1 1";
+					nameTag = "Primary Base";
+					dataBlock = "StationInventory";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "395.29 -411.44 150.337";
+					rotation = "-0 0 -1 87.0895";
+					scale = "1 1 1";
+					shapeName = "stackable2m.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "395.248 -412.498 150.337";
+					rotation = "-0 0 -1 87.0895";
+					scale = "1 1 1";
+					shapeName = "stackable2m.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "405.619 -401.61 151.37";
+					rotation = "-0.377535 0.377836 -0.845404 99.5323";
+					scale = "1 1 1";
+					shapeName = "stackable1m.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "348.768 -395.972 166.392";
+					rotation = "0 0 1 170.351";
+					scale = "1 1 1";
+					shapeName = "stackable1l.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "395.272 -410.325 150.337";
+					rotation = "-0 0 -1 89.9545";
+					scale = "1 1 1";
+					shapeName = "stackable2m.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "395.32 -412.12 151.378";
+					rotation = "-0 0 -1 89.9545";
+					scale = "1 1 1";
+					shapeName = "stackable2m.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "348.732 -393.539 166.392";
+					rotation = "0 0 1 179.518";
+					scale = "1 1 1";
+					shapeName = "stackable1l.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "348.936 -395.724 164.342";
+					rotation = "0 0 1 179.518";
+					scale = "1 1 1";
+					shapeName = "stackable1l.dts";
+
+					locked = "false";
+				};
+				new TSStatic() {
+					position = "348.934 -393.488 164.342";
+					rotation = "0 0 1 179.518";
+					scale = "1 1 1";
+					shapeName = "stackable1l.dts";
+
+					locked = "false";
+				};
+				new ForceFieldBare(Switch1Forcefield) {
+					position = "333.427 339.997 164.103";
+					rotation = "0 0 1 41.826";
+					scale = "8.37007 0.349602 4.27396";
+					dataBlock = "StaticField";
+
+				};
+			};
+			new SimGroup(SecondaryBase) {
+
+
+				new InteriorInstance() {
+					position = "345.025 346.72 164.225";
+					rotation = "0 0 1 41.8259";
+					scale = "1 1 1";
+					interiorFile = "t_bbase_ccb2a.dif";
+					showTerrainInside = "0";
+
+				};
+				new InteriorInstance() {
+					position = "500.194 507.634 158.288";
+					rotation = "0 0 1 134.072";
+					scale = "1 1 1";
+					interiorFile = "flagbridge.dif";
+					showTerrainInside = "0";
+
+				};
+				new StaticShape(AuxilliaryGenerator) {
+					position = "337.293 338.294 156.195";
+					rotation = "0 0 1 42.9719";
+					scale = "1 1 1";
+					nameTag = "Secondary";
+					dataBlock = "GeneratorLarge";
+
+					needsObjectiveWaypoint = "1";
+				};
+				new StaticShape(Switch2) {
+					position = "524.76 525.6 158.286";
+					rotation = "0 0 1 134.072";
+					scale = "1 1 1";
+					nameTag = "\x01742";
+					dataBlock = "FlipFlop";
+
+					missionIndex = "45";
+					name = "Caldera";
+					needsObjectiveWaypoint = "1";
+					missionType = "Siege";
+				};
+				new ForceFieldBare(Switch2Forcefield) {
+					position = "517.425 526.02 158.002";
+					rotation = "0 0 1 134.072";
+					scale = "0.675729 10.6404 8.40442";
+					dataBlock = "StaticField";
+
+				};
+				new ForceFieldBare(Switch1Forcefield) {
+					position = "439.327 595.484 157.002";
+					rotation = "0 0 1 100.268";
+					scale = "0.675729 10.6404 8.40442";
+					dataBlock = "StaticField";
+
+				};
+				new StaticShape(Switch1) {
+					position = "446.155 601.972 157.286";
+					rotation = "0 0 1 100.268";
+					scale = "1 1 1";
+					nameTag = "\x01741";
+					dataBlock = "FlipFlop";
+
+					missionIndex = "41";
+					name = "Alcatraz";
+					needsObjectiveWaypoint = "1";
+					missionType = "Siege";
+				};
+				new InteriorInstance() {
+					position = "433.706 562.157 157.288";
+					rotation = "0 0 1 100.268";
+					scale = "1.34758 1 1";
+					interiorFile = "flagbridge.dif";
+					showTerrainInside = "0";
+
+				};
+				new Item() {
+					position = "344.907 346.616 173.836";
+					rotation = "1 0 0 0";
+					scale = "1 1 1";
+					dataBlock = "RepairPack";
+					collideable = "0";
+					static = "1";
+					rotate = "1";
+
+				};
+				new StaticShape(SecondaryBaseInv) {
+					position = "337.855 353.065 163.227";
+					rotation = "0 0 -1 48.1285";
+					scale = "1 1 1";
+					nameTag = "Secondary Base";
+					dataBlock = "StationInventory";
+
+				};
+				new StaticShape(SecondaryBaseInv) {
+					position = "352.204 340.193 163.238";
+					rotation = "0 0 1 131.78";
+					scale = "1 1 1";
+					nameTag = "Secondary Base";
+					dataBlock = "StationInventory";
+
+				};
+				new InteriorInstance() {
+					position = "556.438 442.794 157.288";
+					rotation = "0 0 1 170.742";
+					scale = "1.34758 1 1";
+					interiorFile = "flagbridge.dif";
+					showTerrainInside = "0";
+
+				};
+				new StaticShape(Switch3) {
+					position = "598.124 444.369 157.286";
+					rotation = "0 0 1 170.742";
+					scale = "1 1 1";
+					nameTag = "\x01743";
+					dataBlock = "FlipFlop";
+
+					missionIndex = "13";
+					name = "Shafted";
+					needsObjectiveWaypoint = "1";
+					missionType = "Siege";
+				};
+				new ForceFieldBare(Switch3Forcefield) {
+					position = "589.727 448.636 157.002";
+					rotation = "0 0 1 170.742";
+					scale = "0.675729 10.6404 8.40442";
+					dataBlock = "StaticField";
+
+				};
+			};
+		};
+	};
+	new WaterBlock() {
+		position = "-168 24 49.0147";
+		rotation = "1 0 0 0";
+		scale = "2048 2048 52.1746";
+		liquidType = "OceanWater";
+		density = "1";
+		viscosity = "5";
+		waveMagnitude = "0";
+		surfaceTexture = "LiquidTiles/BlueWater";
+		surfaceOpacity = "0.6";
+		envMapTexture = "lush/skies/lushcloud1";
+		envMapIntensity = "0.5";
+		removeWetEdges = "0";
+		AudioEnvironment = "Underwater";
+
+		params2 = "0.39 0.39 0.2 0.133";
+		params0 = "0.32 -0.67 0.066 0.5";
+		params1 = "0.63 -2.41 0.33 0.21";
+		floodFill = "1";
+		seedPoints = "0 0 1 0 1 1 0 1";
+		params3 = "1.21 -0.61 0.13 -0.33";
+		locked = "true";
+		extent = "100 100 10";
+		textureSize = "32 32";
+	};
+	new SimGroup(RandomOrganics) {
+
+		new SimGroup(Addition2beplant1) {
+
+			new TSStatic() {
+				position = "44 108 111.053";
+				rotation = "0.0512979 -0.0365577 -0.998014 86.1138";
+				scale = "0.5 0.5 0.5";
+				shapeName = "borg1.dts";
+			};
+			new TSStatic() {
+				position = "372 -68 106.709";
+				rotation = "0.0436774 0.065104 0.996922 236.852";
+				scale = "1.2 1.2 1.2";
+				shapeName = "borg1.dts";
+			};
+			new TSStatic() {
+				position = "204 292 149.975";
+				rotation = "-0.0963798 0.379159 0.920298 88.7482";
+				scale = "0.5 0.5 0.5";
+				shapeName = "borg1.dts";
+			};
+			new TSStatic() {
+				position = "164 -60 111.256";
+				rotation = "-0.0204023 -0.286797 0.957774 113.29";
+				scale = "0.7 0.7 0.7";
+				shapeName = "borg1.dts";
+			};
+			new TSStatic() {
+				position = "132 -44 124.616";
+				rotation = "-0.647116 -0.126482 0.751827 37.9649";
+				scale = "1.4 1.4 1.4";
+				shapeName = "borg1.dts";
+			};
+			new TSStatic() {
+				position = "-20 316 108.1";
+				rotation = "0.0046391 0.107938 -0.994147 76.3266";
+				scale = "1.8 1.8 1.8";
+				shapeName = "borg1.dts";
+			};
+			new TSStatic() {
+				position = "140 204 119.631";
+				rotation = "0.0211678 0.193428 0.980886 154.481";
+				scale = "1.9 1.9 1.9";
+				shapeName = "borg1.dts";
+			};
+			new TSStatic() {
+				position = "196 76 92.475";
+				rotation = "-0.135812 0.352691 0.925831 91.4142";
+				scale = "1.6 1.6 1.6";
+				shapeName = "borg1.dts";
+			};
+			new TSStatic() {
+				position = "156 44 120.037";
+				rotation = "-0.618921 -0.785453 0 20.5709";
+				scale = "1.6 1.6 1.6";
+				shapeName = "borg1.dts";
+			};
+			new TSStatic() {
+				position = "52 -60 115.35";
+				rotation = "-0.00103265 0.119433 -0.992842 25.1747";
+				scale = "1.5 1.5 1.5";
+				shapeName = "borg1.dts";
+			};
+		};
+		new SimGroup(Addition3beplant5) {
+
+			new TSStatic() {
+				position = "92 428 122.297";
+				rotation = "0.330272 0.269765 -0.904515 51.3485";
+				scale = "1 1 1";
+				shapeName = "borg5.dts";
+			};
+			new TSStatic() {
+				position = "172 628 115.844";
+				rotation = "-0.595611 0.0964281 0.797464 28.6244";
+				scale = "1.4 1.4 1.4";
+				shapeName = "borg5.dts";
+			};
+			new TSStatic() {
+				position = "308 508 136.234";
+				rotation = "0.636026 0.0500202 -0.770045 54.1836";
+				scale = "1.2 1.2 1.2";
+				shapeName = "borg5.dts";
+			};
+			new TSStatic() {
+				position = "212 764 102.75";
+				rotation = "-0.289139 -0.376672 -0.880066 70.7517";
+				scale = "1 1 1";
+				shapeName = "borg5.dts";
+			};
+			new TSStatic() {
+				position = "340 660 108.016";
+				rotation = "0.982362 0.186988 0 4.77244";
+				scale = "1.3 1.3 1.3";
+				shapeName = "borg5.dts";
+			};
+			new TSStatic() {
+				position = "284 724 117.453";
+				rotation = "0.460605 -0.0257951 -0.88723 36.9243";
+				scale = "1.4 1.4 1.4";
+				shapeName = "borg5.dts";
+			};
+			new TSStatic() {
+				position = "300 380 160.297";
+				rotation = "0.121704 -0.0516837 -0.99122 82.5002";
+				scale = "1.2 1.2 1.2";
+				shapeName = "borg5.dts";
+			};
+			new TSStatic() {
+				position = "196 356 154.531";
+				rotation = "-0.240409 -0.104238 0.965059 226.503";
+				scale = "1.2 1.2 1.2";
+				shapeName = "borg5.dts";
+			};
+			new TSStatic() {
+				position = "348 684 104.891";
+				rotation = "0.344181 -0.106954 0.932792 47.888";
+				scale = "1 1 1";
+				shapeName = "borg5.dts";
+			};
+			new TSStatic() {
+				position = "452 636 150.031";
+				rotation = "-0.320781 0.166121 0.932472 24.6165";
+				scale = "1 1 1";
+				shapeName = "borg5.dts";
+			};
+		};
+		new SimGroup(Addition4besmtree17) {
+
+			new TSStatic() {
+				position = "820 532 103.531";
+				rotation = "0.14085 0.0770442 0.987029 157.291";
+				scale = "1 1 1";
+				shapeName = "borg17.dts";
+			};
+			new TSStatic() {
+				position = "492 668 160.453";
+				rotation = "-0.139732 0.178281 0.974008 51.1657";
+				scale = "0.9 0.9 0.9";
+				shapeName = "borg17.dts";
+			};
+			new TSStatic() {
+				position = "700 484 159.5";
+				rotation = "0 0 1 159";
+				scale = "0.9 0.9 0.9";
+				shapeName = "borg17.dts";
+			};
+			new TSStatic() {
+				position = "452 652 151.109";
+				rotation = "-0.440485 -0.0918741 0.893046 44.3477";
+				scale = "1.3 1.3 1.3";
+				shapeName = "borg17.dts";
+			};
+			new TSStatic() {
+				position = "772 572 136.094";
+				rotation = "-0.107284 -0.0160703 -0.994099 91.3387";
+				scale = "1.4 1.4 1.4";
+				shapeName = "borg17.dts";
+			};
+			new TSStatic() {
+				position = "564 588 172.641";
+				rotation = "0.100956 -0.0466746 -0.993795 94.3552";
+				scale = "1.4 1.4 1.4";
+				shapeName = "borg17.dts";
+			};
+		};
+		new SimGroup(Addition5besmtree17) {
+
+			new TSStatic() {
+				position = "44 348 111.953";
+				rotation = "-0.000415207 0.0448297 -0.998995 118.051";
+				scale = "0.9 0.9 0.9";
+				shapeName = "borg17.dts";
+			};
+		};
+		new SimGroup(Addition6beplant23) {
+
+			new TSStatic() {
+				position = "-28 148 190.094";
+				rotation = "0 0 -1 75.0002";
+				scale = "1.1 1.1 1.1";
+				shapeName = "borg23.dts";
+			};
+			new TSStatic() {
+				position = "-100 132 109.578";
+				rotation = "0 0 1 52";
+				scale = "0.8 0.8 0.8";
+				shapeName = "borg23.dts";
+			};
+			new TSStatic() {
+				position = "12 212 170.672";
+				rotation = "0 0 1 240";
+				scale = "1.2 1.2 1.2";
+				shapeName = "borg23.dts";
+			};
+		};
+		new SimGroup(Addition7belgtree19) {
+
+			new TSStatic() {
+				position = "4 36 164.234";
+				rotation = "0 0 1 20";
+				scale = "0.9 0.9 0.9";
+				shapeName = "borg19.dts";
+			};
+		};
+		new SimGroup(Addition8belgtree16) {
+
+			new TSStatic() {
+				position = "284 -108 107.969";
+				rotation = "0 0 1 227";
+				scale = "1.1 1.1 1.1";
+				shapeName = "borg16.dts";
+			};
+			new TSStatic() {
+				position = "44 -388 133.812";
+				rotation = "0 0 1 208";
+				scale = "1.5 1.5 1.5";
+				shapeName = "borg16.dts";
+			};
+			new TSStatic() {
+				position = "244 -108 107.141";
+				rotation = "0 0 -1 64.0005";
+				scale = "0.9 0.9 0.9";
+				shapeName = "borg16.dts";
+			};
+			new TSStatic() {
+				position = "196 -196 115.094";
+				rotation = "0 0 1 140";
+				scale = "1.5 1.5 1.5";
+				shapeName = "borg16.dts";
+			};
+			new TSStatic() {
+				position = "60 -148 80.125";
+				rotation = "0 0 -1 111";
+				scale = "1.1 1.1 1.1";
+				shapeName = "borg16.dts";
+			};
+		};
+		new SimGroup(Addition9belgtree19) {
+
+			new TSStatic() {
+				position = "420 -308 153.187";
+				rotation = "0 0 1 201";
+				scale = "1.3 1.3 1.3";
+				shapeName = "borg19.dts";
+			};
+			new TSStatic() {
+				position = "460 -420 159.047";
+				rotation = "0 0 1 186";
+				scale = "0.8 0.8 0.8";
+				shapeName = "borg19.dts";
+			};
+			new TSStatic() {
+				position = "332 -524 162.422";
+				rotation = "0 0 -1 69.0002";
+				scale = "1.2 1.2 1.2";
+				shapeName = "borg19.dts";
+			};
+		};
+		new SimGroup(Addition10beplant7) {
+
+			new TSStatic() {
+				position = "44 -812 111.984";
+				rotation = "0 0 -1 35";
+				scale = "1.2 1.2 1.2";
+				shapeName = "borg7.dts";
+			};
+			new TSStatic() {
+				position = "-404 -868 110.844";
+				rotation = "0 0 1 49";
+				scale = "1.2 1.2 1.2";
+				shapeName = "borg7.dts";
+			};
+			new TSStatic() {
+				position = "-180 -636 111.703";
+				rotation = "0 0 1 75.0002";
+				scale = "1.2 1.2 1.2";
+				shapeName = "borg7.dts";
+			};
+			new TSStatic() {
+				position = "-108 -972 79.7032";
+				rotation = "0 0 1 64.9998";
+				scale = "0.8 0.8 0.8";
+				shapeName = "borg7.dts";
+			};
+			new TSStatic() {
+				position = "-292 -780 95.5625";
+				rotation = "0 0 -1 83.0004";
+				scale = "1.2 1.2 1.2";
+				shapeName = "borg7.dts";
+			};
+			new TSStatic() {
+				position = "-140 -804 78.0938";
+				rotation = "0 0 -1 82";
+				scale = "0.9 0.9 0.9";
+				shapeName = "borg7.dts";
+			};
+			new TSStatic() {
+				position = "68 -796 127.125";
+				rotation = "1 0 0 0";
+				scale = "1 1 1";
+				shapeName = "borg7.dts";
+			};
+			new TSStatic() {
+				position = "28 -964 102.109";
+				rotation = "0 0 1 152";
+				scale = "1.2 1.2 1.2";
+				shapeName = "borg7.dts";
+			};
+			new TSStatic() {
+				position = "20 -612 109.578";
+				rotation = "0 0 1 79";
+				scale = "0.8 0.8 0.8";
+				shapeName = "borg7.dts";
+			};
+			new TSStatic() {
+				position = "-268 -580 99.7656";
+				rotation = "0 0 -1 94";
+				scale = "0.9 0.9 0.9";
+				shapeName = "borg7.dts";
+			};
+			new TSStatic() {
+				position = "44 -636 109.734";
+				rotation = "0 0 1 94";
+				scale = "1.1 1.1 1.1";
+				shapeName = "borg7.dts";
+			};
+			new TSStatic() {
+				position = "-236 -772 70.5";
+				rotation = "0 0 -1 110";
+				scale = "1.2 1.2 1.2";
+				shapeName = "borg7.dts";
+			};
+			new TSStatic() {
+				position = "-364 -612 123.781";
+				rotation = "0 0 1 56";
+				scale = "0.9 0.9 0.9";
+				shapeName = "borg7.dts";
+			};
+			new TSStatic() {
+				position = "-316 -940 84.875";
+				rotation = "0 0 1 54";
+				scale = "1 1 1";
+				shapeName = "borg7.dts";
+			};
+			new TSStatic() {
+				position = "-172 -884 114.734";
+				rotation = "0 0 1 91";
+				scale = "1.1 1.1 1.1";
+				shapeName = "borg7.dts";
+			};
+		};
+		new SimGroup(Addition11belgtree16) {
+
+			new TSStatic() {
+				position = "-236 -260 135.469";
+				rotation = "0 0 1 36";
+				scale = "1.2 1.2 1.2";
+				shapeName = "borg16.dts";
+			};
+			new TSStatic() {
+				position = "-196 -236 135.422";
+				rotation = "0 0 1 79";
+				scale = "0.9 0.9 0.9";
+				shapeName = "borg16.dts";
+			};
+			new TSStatic() {
+				position = "-284 -108 115.281";
+				rotation = "0 0 -1 66.0002";
+				scale = "1.3 1.3 1.3";
+				shapeName = "borg16.dts";
+			};
+		};
+		new SimGroup(Addition12beplant31) {
+
+			new TSStatic() {
+				position = "-180 220 118.453";
+				rotation = "0 0 1 126";
+				scale = "1.3 1.3 1.3";
+				shapeName = "borg31.dts";
+			};
+			new TSStatic() {
+				position = "-116 188 110.797";
+				rotation = "0 0 1 181";
+				scale = "0.8 0.8 0.8";
+				shapeName = "borg31.dts";
+			};
+			new TSStatic() {
+				position = "-108 -20 113.516";
+				rotation = "0 0 1 165";
+				scale = "1 1 1";
+				shapeName = "borg31.dts";
+			};
+			new TSStatic() {
+				position = "-92 -68 114.016";
+				rotation = "0 0 -1 38";
+				scale = "1 1 1";
+				shapeName = "borg31.dts";
+			};
+			new TSStatic() {
+				position = "-100 52 113.5";
+				rotation = "0 0 1 234";
+				scale = "1 1 1";
+				shapeName = "borg31.dts";
+			};
+			new TSStatic() {
+				position = "-156 212 115.062";
+				rotation = "0 0 -1 59.0003";
+				scale = "1 1 1";
+				shapeName = "borg31.dts";
+			};
+			new TSStatic() {
+				position = "-260 -28 121.797";
+				rotation = "0 0 1 82.9998";
+				scale = "1.2 1.2 1.2";
+				shapeName = "borg31.dts";
+			};
+		};
+		new SimGroup(Addition13belgtree18) {
+
+			new TSStatic() {
+				position = "-436 484 159.469";
+				rotation = "0 0 1 91";
+				scale = "1.3 1.3 1.3";
+				shapeName = "borg18.dts";
+			};
+			new TSStatic() {
+				position = "-356 460 157.891";
+				rotation = "0 0 1 239";
+				scale = "1 1 1";
+				shapeName = "borg18.dts";
+			};
+			new TSStatic() {
+				position = "-492 340 158.813";
+				rotation = "0 0 1 189";
+				scale = "1.4 1.4 1.4";
+				shapeName = "borg18.dts";
+			};
+		};
+		new SimGroup(Addition14belgtree18) {
+
+			new TSStatic() {
+				position = "68 628 115.391";
+				rotation = "0 0 1 88";
+				scale = "0.8 0.8 0.8";
+				shapeName = "borg18.dts";
+			};
+			new TSStatic() {
+				position = "220 868 128.422";
+				rotation = "0 0 1 160";
+				scale = "1 1 1";
+				shapeName = "borg18.dts";
+			};
+			new TSStatic() {
+				position = "212 708 118.109";
+				rotation = "0 0 1 169";
+				scale = "1.5 1.5 1.5";
+				shapeName = "borg18.dts";
+			};
+		};
+	};
+};
+//--- OBJECT WRITE END ---
+
+// ===================================================================
+// ===================================================================
+// ==================== begin package NonSequitur ====================
+// ===================================================================
+// ===================================================================
+
+package NonSequitur
+{
+
+
+function NonSequitur_MainInit()
+{
+	// 0 = only select maps from current gametype
+	// 1 = select maps from all available gametypes
+	$NonSequitur::EnableAllGameTypes = 0;
+
+	// 0 = do not allow this map to be selected
+	// 1 = allow this map to be selected
+	$NonSequitur::AllowSelfSelection = 0;
+}
+
+function NonSequitur_Deactivate()
+{
+	// not 100% necessary, but can help with debugging
+	for (%i = 1; %i <= 2; %i++)
+	{
+		Game.switchName[%i] = "";
+		Game.switchHostMissionFile[%i] = "";
+		Game.switchType[%i] = "";
+	}
+
+	deleteVariables("$NonSequitur::*");
+	deactivatePackage(NonSequitur);
+}
+
+function NonSequitur_getGameType()
+{
+	// returns numeric representation of current game type
+	for (%type = 0; %type < $HostTypeCount; %type++)
+		if ($CurrentMissionType $= $HostTypeDisplayName[%type])
+			return %type;
+}
+
+// cycle missions depending on who won
+function NonSequitur_cycleMissions()
+{
+	echo("cycling mission. " @ ClientGroup.getCount() @ " clients in game.");
+
+	echo("next mission:" @ $NonSequitur::nextMission SPC "next gametype:" @ $NonSequitur::nextMissionType);
+
+	if ($NonSequitur::nextHostMissionFile !$= "" && $NonSequitur::nextMissionType !$= "")
+	{
+		messageAll('MsgClient', 'Loading %1 (%2)...', $NonSequitur::nextMission, $NonSequitur::nextMissionType);
+		%nextMission = $NonSequitur::nextHostMissionFile;
+		%nextMissionType = $NonSequitur::nextMissionType;
+		loadMission(%nextMission, %nextMissionType);
+		NonSequitur_Deactivate();
+	}
+	else
+	{
+		%nextMission = findNextCycleMission();
+		messageAll('MsgClient', 'Loading %1 (%2)...', %nextMission, $MissionTypeDisplayName);
+		loadMission(%nextMission, $CurrentMissionType);
+		NonSequitur_Deactivate();
+	}
+}
+
+function SiegeGame::missionLoadDone(%game)
+{
+	NonSequitur_MainInit();
+	NonSequitur_ObjectiveInit();
+
+	// call the original function
+	Parent::missionLoadDone(%game);
+
+	// disable assets
+	disableAssets("TowerGen UpperTowerStation MiddleTowerStation LowerTowerStation TowerSensor UpperTowerSentry LowerTowerSentry");
+}
+
+// pick the maps and name the objects
+function NonSequitur_ObjectiveInit()
+{
+	%i = 1;
+	%max = 3;
+
+	while (%i <= %max)
+	{
+		if ($NonSequitur::EnableAllGameTypes)
+			%type = getRandom($HostTypeCount - 1);
+		else
+			%type = NonSequitur_getGameType();
+
+		%mission[%i] = getRandom($HostMissionCount[%type] - 1);
+		%missionType[%i] = %type;
+		%missionIndex[%i] = $HostMission[%missionType[%i], %mission[%i]];
+		%missionName[%i] = $HostMissionName[%missionIndex[%i]];
+
+		switch (%i)
+		{
+			case 1:
+				if ($NonSequitur::AllowSelfSelection)
+					%i++;
+				else if (%missionName[%i] !$= $MissionDisplayName)
+					%i++;
+			case 2:
+				if (%mission[1] != %mission[2])
+				{
+					if ($NonSequitur::AllowSelfSelection)
+						%i++;
+					else if (%missionName[2] !$= $MissionDisplayName)
+						%i++;
+				}
+			case 3:
+				if (%mission[1] != %mission[3] && %mission[2] != %mission[3])
+				{
+					if ($NonSequitur::AllowSelfSelection)
+						%i++;
+					else if (%missionName[3] !$= $MissionDisplayName)
+						%i++;
+				}
+		}
+	}
+
+	for (%i = 1; %i <= 3; %i++)
+	{
+		%typeName[%i] = $HostTypeName[%missionType[%i]];
+		echo("mission"@%i@":" SPC %mission[%i] SPC %missionIndex[%i] SPC %missionName[%i] SPC %typeName[%i]);
+
+		if ($NonSequitur::EnableAllGameTypes)
+		{
+			%name = %missionName[%i] SPC "("@%typeName[%i]@")";
+			%nameTag = addTaggedString(%missionName[%i] SPC "("@%typeName[%i]@")");
+		}
+		else
+		{
+			%name = %missionName[%i];
+			%nameTag = addTaggedString(%missionName[%i]);
+		}
+
+		%switch = nameToId("Switch" @ %i);
+		%switch.name = %name;
+		%switch.nameTag = %nameTag;
+		%switch.missionType = %typeName[%i];
+		%switch.missionIndex = %missionIndex[%i];
+	}
+}
+
+// change the capture messages
+function FlipFlop::playerTouch(%data, %flipflop, %player)
+{
+	echo("mission:" @ %flipflop.name SPC "type:" @ %flipflop.missionType SPC "index:" @ %flipflop.missionIndex);
+
+	if (%player.team != Game.offenseTeam)
+		return;
+
+	%offTeam = Game.offenseTeam;
+	%defTeam = %offTeam == 1 ? 2 : 1;
+
+	Game.capPlayer[%offTeam] = stripChars(getTaggedString(%player.client.name), "\cp\co\c6\c7\c8\c9");
+	Game.switchName[%offTeam] = %flipflop.name;
+	Game.switchHostMissionFile[%offTeam] = $HostMissionFile[%flipflop.missionIndex];
+	Game.switchType[%offTeam] = %flipflop.missionType;
+	if ($NonSequitur::nextMission $= "")
+	{
+		$NonSequitur::nextMission = %flipflop.name;
+		$NonSequitur::nextHostMissionFile = $HostMissionFile[%flipflop.missionIndex];
+		$NonSequitur::nextMissionType = %flipflop.missionType;
+	}
+
+	// Let the observers know:
+	messageTeam(0, 'MsgSiegeTouchFlipFlop', '\c2%1 has selected %2 for the %3 team!~wfx/misc/flipflop_taken.wav', %player.client.name, Game.cleanWord(%flipflop.name), $TeamName[%offTeam]);
+
+	// Let the teammates know:
+	messageTeam(%player.team, 'MsgSiegeTouchFlipFlop', '\c2%1 has selected %2 for the %3 team!~wfx/misc/flipflop_taken.wav', %player.client.name, Game.cleanWord(%flipflop.name), $TeamName[%offTeam]);
+
+	// Let the other team know:
+	messageTeam(%defTeam, 'MsgSiegeTouchFlipFlop', '\c2%1 has selected %2 for the %3 team!~wfx/misc/flipflop_lost.wav', %player.client.name, Game.cleanWord(%flipflop.name), $TeamName[%offTeam]);
+
+	logEcho(%player.client.nameBase@" (pl "@%player@"/cl "@%player.client@") captured team "@%defTeam@" base");
+
+	Game.allObjectivesCompleted();
+}
+
+function NonSequitur_getWinner()
+{
+	// returns:
+	// -2 for an error
+	// -1 for no winner
+	// 0 for a tie
+	// 1 for team 1
+	// 2 for team 2
+
+	// if neither team captured
+	if ($teamScore[1] == 0 && $teamScore[2] == 0)
+		return -1;
+
+	// else see if team1 won
+	else if ($teamScore[1] > 0 && ($teamScore[2] == 0 || $teamScore[1] < $teamScore[2]))
+		return 1;
+
+	// else see if team2 won
+	else if ($teamScore[2] > 0 && ($teamScore[1] == 0 || $teamScore[2] < $teamScore[1]))
+		return 2;
+
+	// else see if it was a tie (right down to the millisecond - doubtful)
+	else if ($teamScore[1] == $teamScore[2])
+		return 0;
+
+	// an error has occurred
+	return -2;
+}
+
+// change the default victory messages
+function SiegeGame::allObjectivesCompleted(%game)
+{
+	Cancel(%game.timeSync);
+	Cancel(%game.timeThread);
+	cancelEndCountdown();
+
+	// store the elapsed time in the teamScore array...
+	$teamScore[%game.offenseTeam] = getSimTime() - %game.startTimeMS;
+	messageAll('MsgSiegeCaptured', '\c2Team %1 captured the %2 base in %3!', $teamName[%game.offenseTeam], %game.switchName[%game.offenseTeam], %game.formatTime($teamScore[%game.offenseTeam]));
+
+	// set the new timelimit
+	%game.timeLimitMS = $teamScore[%game.offenseTeam];
+
+	if (%game.firstHalf)
+	{
+		// it's halftime, let everyone know
+		messageAll( 'MsgSiegeHalftime' );
+	}
+	else
+	{
+		// game is over
+		messageAll('MsgSiegeMisDone', '\c2Mission complete.');
+	}
+	logEcho("objective completed in "@%game.timeLimitMS);
+
+	// setup the second half...
+	// scheduling for 0 seconds will prevent player deletion-related crashes
+	%game.schedule(0, halftime, 'objectives');
+}
+
+// change the default halftime summary messages
+function SiegeGame::halftime(%game, %reason)
+{
+	// stop the game and the bots
+	$MatchStarted = false;
+	AISystemEnabled(false);
+
+	// reset the offense spawns
+	nameToId("TowerSpawn").sphereWeight = 0;
+	nameToId("VehiclePadSpawn").sphereWeight = 100;
+
+	if (%game.firstHalf)
+	{
+		//switch the game variables
+		%game.firstHalf = false;
+		%oldOffenseTeam = %game.offenseTeam;
+		if (%game.offenseTeam == 1)
+			%game.offenseTeam = 2;
+		else
+			%game.offenseTeam = 1;
+
+		//send the message
+		messageAll('MsgSiegeRolesSwitched', '\c2Team %1 is now on offense.', $teamName[%game.offenseTeam], %game.offenseTeam);
+
+		//reset stations that players were using
+		%game.resetPlayers();
+		// zero out the counts for deployable items (found in defaultGame.cs)
+		%game.clearDeployableMaxes();
+
+		// clean up the MissionCleanup group - note, this includes deleting all the player objects
+		%clean = nameToID("MissionCleanup");
+		%clean.housekeeping();
+
+		// Non static objects placed in original position
+		resetNonStaticObjPositions();
+
+		// switch the teams for objects belonging to the teams
+		%group = nameToID("MissionGroup/Teams");
+		%group.swapTeams();
+
+		//restore the objects
+		%game.restoreObjects();
+
+		%count = ClientGroup.getCount();
+		for(%cl = 0; %cl < %count; %cl++)
+		{
+			%client = ClientGroup.getObject(%cl);
+			if (!%client.isAIControlled())
+			{
+				// Put everybody in observer mode:
+				%client.camera.getDataBlock().setMode(%client.camera, "observerStaticNoNext");
+				%client.setControlObject(%client.camera);
+
+				// Send the halftime result info:
+				if (%client.team == %oldOffenseTeam)
+				{
+					if ($teamScore[%oldOffenseTeam] > 0)
+						messageClient(%client, 'MsgSiegeResult', "", '%1 captured the %2 base in %3!', %game.capPlayer[%oldOffenseTeam], %game.switchName[%oldOffenseTeam], %game.formatTime($teamScore[%oldOffenseTeam], true));
+					else
+						messageClient(%client, 'MsgSiegeResult', "", 'Your team failed to capture any bases.', $teamName[%game.offenseTeam]);
+				}
+				else if ($teamScore[%oldOffenseTeam] > 0)
+					messageClient(%client, 'MsgSiegeResult', "", '%1 captured your %2 base in %3!', %game.capPlayer[%oldOffenseTeam], %game.switchName[%oldOffenseTeam], %game.formatTime($teamScore[%oldOffenseTeam], true));
+				else
+					messageClient(%client, 'MsgSiegeResult', "", 'Your team successfully held off team %1!', $teamName[%oldOffenseTeam]);
+
+				// List out the team rosters:
+				messageClient(%client, 'MsgSiegeAddLine', "", '<spush><color:00dc00><font:univers condensed:18><clip%%:50>%1</clip><lmargin%%:50><clip%%:50>%2</clip><spop>', $TeamName[1], $TeamName[2]);
+				%max = $TeamRank[1, count] > $TeamRank[2, count] ? $TeamRank[1, count] : $TeamRank[2, count];
+				for (%line = 0; %line < %max; %line++)
+				{
+					%plyr1 = $TeamRank[1, %line] $= "" ? "" : $TeamRank[1, %line].name;
+					%plyr2 = $TeamRank[2, %line] $= "" ? "" : $TeamRank[2, %line].name;
+					messageClient(%client, 'MsgSiegeAddLine', "", '<lmargin:0><clip%%:50> %1</clip><lmargin%%:50><clip%%:50> %2</clip>', %plyr1, %plyr2);
+				}
+
+				// Show observers:
+				%header = false;
+				for (%i = 0; %i < %count; %i++)
+				{
+					%obs = ClientGroup.getObject(%i);
+					if (%obs.team <= 0)
+					{
+						if (!%header)
+						{
+							messageClient(%client, 'MsgSiegeAddLine', "", '\n<lmargin:0><spush><color:00dc00><font:univers condensed:18>OBSERVERS<spop>');
+							%header = true;
+						}
+
+						messageClient(%client, 'MsgSiegeAddLine', "", ' %1', %obs.name);
+					}
+				}
+
+				commandToClient(%client, 'SetHalftimeClock', $Host::Siege::Halftime / 60000);
+
+				// Get the HUDs right:
+				commandToClient(%client, 'setHudMode', 'SiegeHalftime');
+				commandToClient(%client, 'ControlObjectReset');
+
+				clientResetTargets(%client, true);
+				%client.notReady = true;
+			}
+		}
+
+		%game.schedule($Host::Siege::Halftime, halftimeOver);
+	}
+	else
+	{
+		// let's wrap it all up
+		%game.gameOver();
+		NonSequitur_cycleMissions();
+	}
+}
+
+function SiegeGame::halftimeOver(%game)
+{
+	// call the original function
+	Parent::halftimeOver(%game);
+
+	// disable assets
+	disableAssets("TowerGen UpperTowerStation MiddleTowerStation LowerTowerStation TowerSensor UpperTowerSentry LowerTowerSentry");
+}
+
+function SiegeGame::gameOver(%game)
+{
+	// determine the "winning map"
+	%winner = NonSequitur_getWinner();
+	echo("winner:" @ %winner SPC "mission:" @ %game.switchName[%winner] SPC "hostname:" @ %game.switchHostMissionFile[%winner] SPC "type:" @ %game.switchType[%winner]);
+	$NonSequitur::nextMission = %game.switchName[%winner];
+	$NonSequitur::nextHostMissionFile = %game.switchHostMissionFile[%winner];
+	$NonSequitur::nextMissionType = %game.switchType[%winner];
+
+	Parent::gameOver(%game);
+
+	exec("scripts/forceField.cs");
+
+	if (%winner == -1)
+		NonSequitur_Deactivate();
+}
+
+// change the victory messages on the debriefing page
+function SiegeGame::sendDebriefing(%game, %client)
+{
+	// who's our winner?
+	%winnerName = "";
+	%winner = NonSequitur_getWinner();
+	if (%winner > 0)
+		%winnerName = $teamName[%winner];
+
+	// send the winner message
+	if (%winnerName $= 'Storm')
+		messageClient( %client, 'MsgGameOver', "Match has ended.~wvoice/announcer/ann.stowins.wav" );
+	else if (%winnerName $= 'Inferno')
+		messageClient( %client, 'MsgGameOver', "Match has ended.~wvoice/announcer/ann.infwins.wav" );
+	else
+		messageClient( %client, 'MsgGameOver', "Match has ended.~wvoice/announcer/ann.gameover.wav" );
+
+	// Mission result:
+	if (%winner > 0)
+	{
+		if (%winner == 1)
+		{  
+			if ($teamScore[2] == 0)
+				messageClient(%client, 'MsgDebriefResult', "", '<just:center>Team %1 wins!', $TeamName[1]);
+			else
+			{
+				%timeDiffMS = $teamScore[2] - $teamScore[1];
+				messageClient(%client, 'MsgDebriefResult', "", '<just:center>Team %1 won by capturing the %2 base %3 faster!', $TeamName[1], %game.switchName[%winner], %game.formatTime(%timeDiffMS, true));
+			}
+		}
+		else
+		{
+			if ($teamScore[1] == 0)
+				messageClient(%client, 'MsgDebriefResult', "", '<just:center>Team %1 wins!', $TeamName[2]);
+			else
+			{
+				%timeDiffMS = $teamScore[1] - $teamScore[2];
+				messageClient(%client, 'MsgDebriefResult', "", '<just:center>Team %1 won by capturing the %2 base %3 faster!', $TeamName[2], %game.switchName[%winner], %game.formatTime(%timeDiffMS, true));
+			}
+		}
+	}
+	else
+		messageClient( %client, 'MsgDebriefResult', "", '<just:center>The mission ended in a tie.' );
+
+	// Game summary:
+	messageClient( %client, 'MsgDebriefAddLine', "", '<spush><color:00dc00><font:univers condensed:18>SUMMARY:<spop>' );
+	%team1 = %game.offenseTeam == 1 ? 2 : 1;
+	%team2 = %game.offenseTeam;
+	if ( $teamScore[%team1] > 0 )
+	{  
+		%timeStr = %game.formatTime($teamScore[%team1], true);
+		messageClient(%client, 'MsgDebriefAddLine', "", '<bitmap:bullet_2><lmargin:24>%1 captured the %2 base for Team %3 in %4.<lmargin:0>', %game.capPlayer[%team1], %game.switchName[%team1], $TeamName[%team1], %timeStr);
+	}
+	else
+		messageClient(%client, 'MsgDebriefAddLine', "", '<bitmap:bullet_2><lmargin:24>Team %1 failed to capture any of the bases.<lmargin:0>', $TeamName[%team1]);
+
+	if ( $teamScore[%team2] > 0 )
+	{  
+		%timeStr = %game.formatTime($teamScore[%team2], true);
+		messageClient(%client, 'MsgDebriefAddLine', "", '<bitmap:bullet_2><lmargin:24>%1 captured the %2 base for Team %3 in %4.<lmargin:0>', %game.capPlayer[%team2], %game.switchName[%team2], $TeamName[%team2], %timeStr);
+	}
+	else
+		messageClient(%client, 'MsgDebriefAddLine', "", '<bitmap:bullet_2><lmargin:24>Team %1 failed to capture any of the bases.<lmargin:0>', $TeamName[%team2]);
+
+	// List out the team rosters:
+	messageClient(%client, 'MsgDebriefAddLine', "", '\n<spush><color:00dc00><font:univers condensed:18><clip%%:50>%1</clip><lmargin%%:50><clip%%:50>%2</clip><spop>', $TeamName[1], $TeamName[2]);
+	%max = $TeamRank[1, count] > $TeamRank[2, count] ? $TeamRank[1, count] : $TeamRank[2, count];
+	for ( %line = 0; %line < %max; %line++ )
+	{
+		%plyr1 = $TeamRank[1, %line] $= "" ? "" : $TeamRank[1, %line].name;
+		%plyr2 = $TeamRank[2, %line] $= "" ? "" : $TeamRank[2, %line].name;
+		messageClient( %client, 'MsgDebriefAddLine', "", '<lmargin:0><clip%%:50> %1</clip><lmargin%%:50><clip%%:50> %2</clip>', %plyr1, %plyr2 );
+	}
+
+	// Show observers:
+	%count = ClientGroup.getCount();
+	%header = false;
+	for ( %i = 0; %i < %count; %i++ )
+	{
+		%cl = ClientGroup.getObject( %i );
+		if ( %cl.team <= 0 )
+		{
+			if ( !%header )
+			{
+				messageClient( %client, 'MsgDebriefAddLine', "", '\n<lmargin:0><spush><color:00dc00><font:univers condensed:18>OBSERVERS<spop>' );
+				%header = true;
+			}
+
+			messageClient( %client, 'MsgDebriefAddLine', "", ' %1', %cl.name );
+		}
+	}
+}
+
+function Generator::onEnabled(%data, %obj, %prevState)
+{
+	Parent::onEnabled(%data, %obj, %prevState);
+
+	if (%obj == nameToId("TowerGen"))
+	{
+		nameToId("TowerSpawn").sphereWeight = 65;
+		nameToId("VehiclePadSpawn").sphereWeight = 35;
+	}
+	else if (%obj == nameToId("PrimaryGenerator1") || %obj == nameToId("PrimaryGenerator2"))
+	{
+		%primaryGensUp = (nameToId("PrimaryGenerator1").isEnabled() || nameToId("PrimaryGenerator2").isEnabled());
+		if (%primaryGensUp)
+		{
+			nameToId("PrimaryBaseSpawn").sphereWeight = 70;
+			nameToId("SecondaryBaseSpawn").sphereWeight = 30;
+		}
+	}
+}
+
+function Generator::onDisabled(%data, %obj)
+{
+	Parent::onDisabled(%data, %obj);
+
+	if (%obj == nameToId("TowerGen"))
+	{
+		nameToId("TowerSpawn").sphereWeight = 0;
+		nameToId("VehiclePadSpawn").sphereWeight = 100;
+	}
+	else if (%obj == nameToId("PrimaryGenerator1") || %obj == nameToId("PrimaryGenerator2"))
+	{
+		%primaryGensDown = (!nameToId("PrimaryGenerator1").isEnabled() && !nameToId("PrimaryGenerator2").isEnabled());
+		if (%primaryGensDown)
+		{
+			nameToId("PrimaryBaseSpawn").sphereWeight = 0;
+			nameToId("SecondaryBaseSpawn").sphereWeight = 100;
+		}
+	}
+}
+
+function disableAssets(%objects)
+{
+	for (%i = 0; %i < getWordCount(%objects); %i++)
+	{
+		%object = getWord(%objects, %i);
+		%object.setDamageLevel(2.5);
+	}
+}
+
+};
+
+// ===================================================================
+// ===================================================================
+// ==================== end package NonSequitur ======================
+// ===================================================================
+// ===================================================================
+
+if (!$OFFLINE_NAV_BUILD)
+	activatePackage(NonSequitur);
